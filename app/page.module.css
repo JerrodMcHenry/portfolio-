@@ -1,28 +1,45 @@
-.hero {
-  padding-block: var(--space-16) var(--space-12);
+.section {
+  padding-block: var(--space-16);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-6);
+.surface {
+  background: var(--color-surface);
 }
 
-.actions a {
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  text-decoration: none;
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
 }
 
-.actions a:hover {
-  border-color: var(--color-accent);
-  text-decoration: none;
+@media (max-width: 768px) {
+  .projectsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.primary {
-  background: var(--color-accent);
-  color: var(--color-accent-foreground);
-  border-color: var(--color-accent);
+.evidenceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .evidenceGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .evidenceGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.evidenceFooter {
+  margin-top: var(--space-8);
+}
+
+.evidenceFooter a {
+  font-weight: 600;
 }

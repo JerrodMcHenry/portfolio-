@@ -4,9 +4,10 @@ export interface NavItem {
 }
 
 export const siteConfig = {
-  name: "Portfolio",
+  name: "Jerrod McHenry",
+  role: "Software Engineer — Backend Systems & Production AI",
   description:
-    "Software engineering portfolio and technical case studies.",
+    "Software engineering portfolio of Jerrod McHenry: backend systems and production AI, with case studies covering architecture, testing, and security.",
   nav: [
     { label: "Projects", href: "/projects" },
     { label: "Engineering", href: "/engineering" },
