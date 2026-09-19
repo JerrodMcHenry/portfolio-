@@ -1,0 +1,79 @@
+.back {
+  display: inline-block;
+  font-size: 0.875rem;
+  margin-bottom: var(--space-6);
+}
+
+.overview {
+  max-width: 65ch;
+  color: var(--color-muted);
+  font-size: 1.0625rem;
+}
+
+.section {
+  margin-top: var(--space-12);
+}
+
+.conceptsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .conceptsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.appliedList {
+  max-width: 65ch;
+}
+
+.appliedItem {
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.appliedItem:first-child {
+  padding-top: 0;
+}
+
+.appliedItem:last-child {
+  border-bottom: none;
+}
+
+.appliedItem dt {
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.appliedItem dd {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.evidenceList {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.relatedList {
+  list-style: none;
+  max-width: 65ch;
+}
+
+.relatedList li + li {
+  margin-top: var(--space-2);
+}
+
+.relatedList a {
+  font-weight: 600;
+}
+
+.relatedTagline {
+  color: var(--color-muted);
+}

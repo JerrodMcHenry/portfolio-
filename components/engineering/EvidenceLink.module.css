@@ -1,0 +1,9 @@
+.link {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.kind {
+  font-weight: 400;
+  color: var(--color-muted);
+}

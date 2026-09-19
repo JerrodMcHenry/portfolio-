@@ -17,6 +17,7 @@ export default function ProjectsPage() {
         problem, architecture, decisions, tradeoffs, testing, security, and
         production concerns — not just a feature list.
       </p>
+      <h2 className="visuallyHidden">Flagship projects</h2>
       <div className={styles.grid}>
         {projects.map((project) => (
           <ProjectCard key={project.slug} project={project} />
