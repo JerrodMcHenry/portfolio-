@@ -9,11 +9,15 @@ export default function Hero() {
   return (
     <section className={`container ${styles.hero}`}>
       <h1>{siteConfig.name}</h1>
-      <p className={styles.role}>{siteConfig.role}</p>
+      <p className={styles.role}>{siteConfig.tagline}</p>
       <p className={styles.summary}>
-        I build reliable backend systems and AI-enabled products, and I own
-        the engineering behind them end to end: architecture, deterministic
-        business logic, testing, security, and production behavior.
+        I&apos;ve spent my career in and around technology — from hands-on
+        technical roles at Apple to customer-facing roles at software
+        companies. Working directly with engineering teams along the way led
+        me to study computer science and software engineering while
+        continuing my career. I now build backend systems and AI-enabled
+        products, including VentureGPS and Economic Intelligence, as I work
+        toward my first professional software engineering role.
       </p>
       <div className={styles.actions}>
         <Link href="/projects" className={styles.primary}>

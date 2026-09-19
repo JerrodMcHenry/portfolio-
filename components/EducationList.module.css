@@ -1,0 +1,30 @@
+.list {
+  list-style: none;
+}
+
+.list li {
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.list li:first-child {
+  padding-top: 0;
+}
+
+.list li:last-child {
+  border-bottom: none;
+}
+
+.credential {
+  font-weight: 600;
+}
+
+.institution {
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+}
+
+.inProgress {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}

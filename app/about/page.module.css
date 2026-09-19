@@ -1,0 +1,13 @@
+.narrative {
+  max-width: 65ch;
+}
+
+.lede {
+  font-size: 1.125rem;
+  color: var(--color-muted);
+}
+
+.section {
+  margin-top: var(--space-12);
+  max-width: 42rem;
+}

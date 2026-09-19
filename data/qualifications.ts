@@ -14,6 +14,3 @@ export const education: EducationItem[] = [
     institution: "Thomas Edison State University",
   },
 ];
-
-export const professionalPerspective =
-  "Alongside software engineering, I bring experience from enterprise technology and financial/economic data environments — direct exposure to customers, business requirements, and real-world workflows. That context shapes how I approach engineering: not only how to build a system, but why it needs to work a particular way for the people and businesses depending on it.";

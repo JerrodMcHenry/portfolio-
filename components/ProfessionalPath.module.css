@@ -1,0 +1,40 @@
+.timeline {
+  list-style: none;
+  border-left: 2px solid var(--color-border);
+  padding-left: var(--space-6);
+}
+
+.timeline li {
+  position: relative;
+  padding-bottom: var(--space-6);
+}
+
+.timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--space-6) - 4px);
+  top: 0.35em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.company {
+  font-weight: 600;
+}
+
+.jobTitle {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.context {
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+  margin-top: var(--space-1);
+}
