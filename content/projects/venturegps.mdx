@@ -1,0 +1,215 @@
+import CaseStudySection from "@/components/case-study/CaseStudySection";
+import CaseStudyCallout from "@/components/case-study/CaseStudyCallout";
+import Field from "@/components/case-study/Field";
+
+<CaseStudySection id="executive-overview" title="Executive Overview">
+
+VentureGPS is a startup intelligence platform built to help founders and
+investors make better long-term decisions using structured startup
+analysis, rather than gut feel or scattered spreadsheets. It combines a
+deterministic scoring methodology with AI-assisted research, so the number
+an investor sees is reproducible and defensible — not just something a
+language model generated on request.
+
+This case study covers the platform's architecture, the engineering
+decisions behind its scoring system and ingestion pipeline, and how
+deterministic business logic is kept separate from AI-assisted analysis.
+
+</CaseStudySection>
+
+<CaseStudySection id="system-overview" title="System Overview">
+
+At the center of VentureGPS is the **Startup Profile** — a living history
+of a company that accumulates structured information over time, rather
+than a one-off snapshot. Profiles feed a set of shared intelligence
+features used across the platform: rankings, search, scoring,
+benchmarking, and trend analysis.
+
+The product is organized around two audiences with different workflows:
+
+- **Founders** — pitch-deck review, fundraising readiness, coaching,
+  progress tracking, benchmarking, data-room review, and
+  investor-readiness workflows.
+- **Investors** — portfolio tracking, discovery filters, watchlists,
+  alerts, memo export, thesis tagging, and saved views.
+
+Not every one of these workflows is at the same level of maturity; they
+describe the product's intended shape rather than a claim that each is
+fully built out.
+
+### Scoring methodology
+
+Every startup is scored across six weighted pillars, producing an overall
+score from 0–100 alongside a confidence rating.
+
+| Pillar | Weight |
+| --- | --- |
+| Market | 20% |
+| Team | 20% |
+| Product | 20% |
+| Execution | 15% |
+| Traction | 15% |
+| Financial Health | 10% |
+
+Confidence is reported as **Low**, **Medium**, or **High**, and scoring is
+stage-aware — a pre-seed company and a Series B+ company aren't held to
+the same evidentiary bar for, say, traction or financial health. Supported
+stages are Pre-seed, Seed, Series A, and Series B+.
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" title="Architecture">
+
+VentureGPS is a full-stack product: a Next.js frontend in front of a
+backend intelligence layer responsible for startup scoring, readiness
+summaries, analysis, search, and analytics. A distinct ingestion path
+accepts a startup's website URL and analyzes it through a dedicated
+`/analyze-website` endpoint.
+
+Because that ingestion path accepts a URL supplied by a user and fetches
+it server-side, it's treated as a security-sensitive boundary rather than
+a convenience feature — see [Engineering Decisions](#engineering-decisions).
+
+</CaseStudySection>
+
+<CaseStudySection id="engineering-decisions" title="Engineering Decisions">
+
+<CaseStudyCallout
+  kind="decision"
+  title="Treat website ingestion as a security boundary, not a convenience feature"
+>
+
+<Field label="Problem">
+
+Letting a user submit an arbitrary website URL for analysis means the
+server ends up fetching a URL it doesn't control. Without safeguards,
+that request path can be abused to reach internal services, cloud
+metadata endpoints, or other network resources that were never meant to
+be reachable from the outside.
+
+</Field>
+
+<Field label="Alternatives">
+
+Fetch whatever URL the user submits and rely on downstream code to behave
+correctly; or route ingestion through a third-party proxy or screenshot
+service instead of fetching server-side at all.
+
+</Field>
+
+<Field label="Why">
+
+Handling this in-house — with explicit SSRF protections around the
+`/analyze-website` endpoint and dedicated security tests — keeps full
+control over what the ingestion path is and isn't allowed to reach,
+without taking on a dependency (and its cost) for something the
+application can own directly.
+
+</Field>
+
+<Field label="Tradeoffs">
+
+Owning SSRF protection means owning its correctness and keeping it
+current as new bypass techniques surface, instead of delegating that
+responsibility to a vendor.
+
+</Field>
+
+</CaseStudyCallout>
+
+<CaseStudyCallout
+  kind="decision"
+  title="Keep the scoring engine deterministic and separate from AI-assisted analysis"
+>
+
+<Field label="Problem">
+
+Investors and founders need a score they can trust, compare across
+companies, and reproduce — not a number that might change if the same
+startup were re-evaluated by a language model tomorrow.
+
+</Field>
+
+<Field label="Alternatives">
+
+Score companies primarily through LLM prompting, or blend AI output
+directly into the numeric score.
+
+</Field>
+
+<Field label="Why">
+
+A fixed, weighted, six-pillar formula is explainable and stable: an
+investor can see exactly why a company scored the way it did, and the
+same inputs always produce the same score. AI is used for research and
+interpretation, not to move the number.
+
+</Field>
+
+<Field label="Tradeoffs">
+
+Qualitative signal an AI model might notice has to stay advisory — in the
+analysis and narrative around a company — rather than directly changing
+its score.
+
+</Field>
+
+</CaseStudyCallout>
+
+Additional engineering decisions behind VentureGPS — for example, the
+specific data model behind the Startup Profile and the tradeoffs in its
+analytics layer — will be documented here as they're written up in more
+detail.
+
+</CaseStudySection>
+
+<CaseStudySection id="production-engineering" title="Production Engineering">
+
+Known production-engineering evidence for VentureGPS centers on the
+ingestion boundary: the `/analyze-website` endpoint that accepts a
+startup's website URL is SSRF-hardened and backed by dedicated security
+tests, rather than left as an open fetch. The backend intelligence layer —
+scoring, readiness summaries, analysis, search, and analytics — sits
+behind the Next.js frontend as a distinct service boundary.
+
+Further production-engineering detail, such as deployment and
+observability specifics, will be added here as it's documented.
+
+</CaseStudySection>
+
+<CaseStudySection id="ai-engineering" title="AI Engineering">
+
+VentureGPS treats AI as probabilistic infrastructure, not an authority
+over the platform's core numbers. The scoring pillars, weights, and
+stage-aware logic are deterministic business rules — AI is used for
+research and interpretation *around* a company, not to compute or
+override its score.
+
+That distinction matters for anyone evaluating the platform: an investor
+who disagrees with an AI-generated summary can still trust the score
+underneath it, because the score isn't something the AI produced.
+
+</CaseStudySection>
+
+<CaseStudySection id="failures-debugging" title="Real Failures & Debugging">
+
+Specific, verified debugging incidents for VentureGPS aren't documented in
+this portfolio yet. Rather than invent a plausible-sounding story, this
+section is left structured and empty until a real incident — symptom,
+investigation, root cause, fix, verification, and lesson — can be written
+up the same way the Economic Intelligence case study is.
+
+</CaseStudySection>
+
+<CaseStudySection id="scaling-evolution" title="Scaling & Evolution">
+
+VentureGPS's split between a deterministic scoring core and an
+AI-assisted research and interpretation layer is also a scaling decision:
+the two can evolve independently. The scoring methodology can be revised —
+new pillars, adjusted weights, additional stages — without touching how
+AI-assisted research is generated, and vice versa.
+
+No production-scale metrics are published here, because none have been
+verified for this portfolio.
+
+</CaseStudySection>

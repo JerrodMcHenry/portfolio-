@@ -1,0 +1,17 @@
+.field {
+  margin-top: var(--space-4);
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--space-1);
+}
+
+.field p,
+.field ul {
+  margin-bottom: 0;
+}

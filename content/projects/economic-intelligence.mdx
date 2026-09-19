@@ -1,0 +1,379 @@
+import CaseStudySection from "@/components/case-study/CaseStudySection";
+import CaseStudyCallout from "@/components/case-study/CaseStudyCallout";
+import Field from "@/components/case-study/Field";
+
+<CaseStudySection id="executive-overview" title="Executive Overview">
+
+Economic Intelligence is a backend, data-oriented platform for economic
+analysis, built around reliable public economic data, deterministic
+transformations, and explicit data contracts — with AI intentionally
+deferred until that deterministic core is independently correct.
+
+This case study covers its architecture, the engineering decisions behind
+its error handling and data layer, and how it draws a hard line between
+deterministic domain logic and probabilistic AI.
+
+</CaseStudySection>
+
+<CaseStudySection id="system-overview" title="System Overview">
+
+The system is built on Python 3.12, FastAPI, PostgreSQL, SQLAlchemy, and
+Alembic, and integrates with the FRED (Federal Reserve Economic Data) REST
+API via `httpx` to retrieve and synchronize economic-series observations.
+
+Core capabilities include:
+
+- retrieving economic-series observations and their metadata
+- synchronizing FRED observations into PostgreSQL
+- deterministic transformations — absolute change, percent change, and
+  moving average
+- comparing two economic series with exact-date alignment, spread
+  calculation, and Pearson correlation
+- composing these transformations into an analysis pipeline
+
+Every one of these is pure, deterministic software: given the same
+inputs, the outputs don't change.
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" title="Architecture">
+
+The codebase is organized around a conventional layered structure: an API
+layer, a services layer, repositories, Pydantic models for validation and
+serialization, pure domain functions for the actual calculations, and
+centralized configuration.
+
+That separation matters here specifically because the domain functions —
+the transformations and comparisons above — are kept pure and independent
+of the API and persistence layers. They can be tested and reasoned about
+without a database or an HTTP request in the picture, and AI, if and when
+it's introduced, sits outside this layer entirely rather than inside it.
+
+</CaseStudySection>
+
+<CaseStudySection id="engineering-decisions" title="Engineering Decisions">
+
+<CaseStudyCallout
+  kind="decision"
+  title="Map infrastructure failures to explicit, categorized errors instead of letting them leak through"
+>
+
+<Field label="Problem">
+
+A backend that talks to an external API (FRED) and a database has several
+distinct ways to fail — provider authentication errors, database
+operational errors, integrity conflicts, and generic SQLAlchemy failures,
+on top of ordinary invalid input. Left unhandled, those surface as
+inconsistent, unhelpful errors.
+
+</Field>
+
+<Field label="Alternatives">
+
+Rely on framework default exception handling and return generic 500
+responses, or catch and log without categorizing what actually failed.
+
+</Field>
+
+<Field label="Why">
+
+Explicitly mapping each failure class — FRED authentication/provider
+failure, database operational errors, integrity conflicts, generic
+SQLAlchemy failures, invalid date/window input, and structural validation
+failures — to specific handling keeps the deterministic core auditable:
+every known failure mode has a defined, testable behavior instead of an
+implicit one.
+
+</Field>
+
+<Field label="Tradeoffs">
+
+This is more mapping code to write and maintain, and it means
+deliberately thinking through the failure surface of every new external
+dependency instead of leaving it to default behavior.
+
+</Field>
+
+</CaseStudyCallout>
+
+<CaseStudyCallout
+  kind="decision"
+  title="Defer AI-assisted interpretation until the deterministic core is independently correct"
+>
+
+<Field label="Problem">
+
+Economic Intelligence's purpose is reliable, reproducible analysis.
+Introducing AI-assisted interpretation before the deterministic core —
+ingestion, transformations, comparisons — is independently verified risks
+letting AI-generated explanations mask bugs in the underlying
+calculations.
+
+</Field>
+
+<Field label="Alternatives">
+
+Build AI-assisted interpretation features in parallel with the core data
+pipeline, or add AI early to make the product feel more complete sooner.
+
+</Field>
+
+<Field label="Why">
+
+Sequencing it this way means the deterministic core can be tested and
+trusted on its own terms first. When AI-assisted interpretation is
+introduced, it's added as a bounded layer on top of something already
+known to be correct, not asked to compensate for something that isn't.
+
+</Field>
+
+<Field label="Tradeoffs">
+
+The system takes longer to reach AI-assisted features and looks less
+complete in the interim — but the alternative is a probabilistic layer
+sitting on top of an unverified deterministic one.
+
+</Field>
+
+</CaseStudyCallout>
+
+Additional engineering decisions — for example, the specific approach to
+schema migrations with Alembic, or the composable-pipeline design — will
+be documented here as they're written up in more detail.
+
+</CaseStudySection>
+
+<CaseStudySection id="production-engineering" title="Production Engineering">
+
+Economic Intelligence has substantial automated test coverage; an exact
+count isn't published here since it isn't independently verified for this
+portfolio. Production-engineering evidence includes explicit validation
+and structural-validation handling for invalid date/window input, the
+categorized exception-mapping work described above, and a body of
+architecture documentation: an Engineering Journal, current architecture
+documentation, request-flow documentation, and Architecture Decision
+Records.
+
+That documentation is itself a production-engineering signal — the
+project treats explaining *why* the system is built the way it is as part
+of maintaining it, not an afterthought.
+
+</CaseStudySection>
+
+<CaseStudySection id="ai-engineering" title="AI Engineering">
+
+Economic Intelligence is explicit about a boundary: **AI is probabilistic
+infrastructure, not an authority over deterministic application
+correctness.** Economic calculations, validation, permissions, canonical
+state, and deterministic analysis results are not things AI is allowed to
+control.
+
+AI is intended only as a later, optional layer for bounded interpretation
+and explanation on top of results the deterministic core already
+produced — and the deterministic application is designed to remain
+correct if that AI layer is unavailable entirely.
+
+</CaseStudySection>
+
+<CaseStudySection id="failures-debugging" title="Real Failures & Debugging">
+
+<CaseStudyCallout kind="failure" title="Python interpreter mismatch">
+
+<Field label="Symptom">
+
+The local environment resolved to a different Python interpreter than the
+one the project targets (3.12), leading to inconsistent behavior between
+environments.
+
+</Field>
+
+<Field label="Investigation">
+
+Traced which interpreter the project's tooling was actually resolving to,
+and compared it against the intended 3.12 environment.
+
+</Field>
+
+<Field label="Root cause">
+
+The environment wasn't pinned explicitly enough to guarantee the correct
+interpreter was used every time.
+
+</Field>
+
+<Field label="Fix">
+
+Standardized on an explicit, project-pinned Python 3.12 environment.
+
+</Field>
+
+<Field label="Verification">
+
+Confirmed the intended interpreter was used consistently afterward.
+
+</Field>
+
+<Field label="Lesson">
+
+Explicit environment pinning matters even on a single-developer project —
+"works on my machine" failures aren't only a multi-developer problem.
+
+</Field>
+
+</CaseStudyCallout>
+
+<CaseStudyCallout kind="failure" title="Tracked egg-info artifacts">
+
+<Field label="Symptom">
+
+Generated Python packaging metadata (`*.egg-info`) ended up committed to
+the repository.
+
+</Field>
+
+<Field label="Investigation">
+
+Noticed generated packaging output appearing in version control where
+only source should be.
+
+</Field>
+
+<Field label="Root cause">
+
+Build and packaging artifacts weren't excluded from version control from
+the start.
+
+</Field>
+
+<Field label="Fix">
+
+Removed the tracked artifacts and added them to `.gitignore`.
+
+</Field>
+
+<Field label="Verification">
+
+Confirmed the repository stayed clean after rebuilding the package
+locally.
+
+</Field>
+
+<Field label="Lesson">
+
+Exclude build and packaging output from version control before it has a
+chance to get committed, not after.
+
+</Field>
+
+</CaseStudyCallout>
+
+<CaseStudyCallout kind="failure" title="FRED API key exposure and rotation">
+
+<Field label="Symptom">
+
+A FRED API key ended up somewhere it shouldn't have been exposed.
+
+</Field>
+
+<Field label="Investigation">
+
+Identified where and how the key had been exposed.
+
+</Field>
+
+<Field label="Root cause">
+
+Secret handling wasn't sufficiently separated from tracked files and
+configuration.
+
+</Field>
+
+<Field label="Fix">
+
+Rotated the exposed key and moved secret handling to untracked,
+environment-based configuration.
+
+</Field>
+
+<Field label="Verification">
+
+Confirmed the old key no longer worked and that the new key was sourced
+only from untracked configuration.
+
+</Field>
+
+<Field label="Lesson">
+
+Treat any credential that touches a repository as compromised the moment
+it's exposed — rotate first, investigate the cause after.
+
+</Field>
+
+</CaseStudyCallout>
+
+<CaseStudyCallout
+  kind="failure"
+  title="Database and provider error handling was implicit"
+>
+
+<Field label="Symptom">
+
+Database and external-API failures — FRED authentication/provider issues,
+database operational errors, integrity conflicts — had no consistent,
+categorized handling path early on.
+
+</Field>
+
+<Field label="Investigation">
+
+Reviewed the failure modes the application could actually encounter from
+its database and external-API dependencies.
+
+</Field>
+
+<Field label="Root cause">
+
+The data layer hadn't yet mapped infrastructure-level exceptions to
+explicit, categorized handling — see the related
+[engineering decision](#engineering-decisions).
+
+</Field>
+
+<Field label="Fix">
+
+Added explicit exception mapping for FRED authentication/provider
+failure, database operational errors, integrity conflicts, and generic
+SQLAlchemy failures.
+
+</Field>
+
+<Field label="Verification">
+
+Covered by automated tests.
+
+</Field>
+
+<Field label="Lesson">
+
+Error handling for external dependencies needs to be designed
+deliberately; default framework behavior isn't a substitute for it.
+
+</Field>
+
+</CaseStudyCallout>
+
+</CaseStudySection>
+
+<CaseStudySection id="scaling-evolution" title="Scaling & Evolution">
+
+Because the deterministic core doesn't depend on AI being present,
+scaling or evolving the system doesn't have to route through a
+probabilistic bottleneck. New transformations, comparisons, or data
+sources can be added to the deterministic layer on their own schedule,
+and an AI-assisted interpretation layer can be introduced additively on
+top of it later without restructuring the core.
+
+No production-scale metrics are published here, because none have been
+independently verified for this portfolio.
+
+</CaseStudySection>

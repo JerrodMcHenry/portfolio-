@@ -1,0 +1,33 @@
+.header {
+  padding-block: var(--space-12) var(--space-8);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.back {
+  display: inline-block;
+  font-size: 0.875rem;
+  margin-bottom: var(--space-6);
+}
+
+.tagline {
+  color: var(--color-muted);
+  font-size: 1.0625rem;
+  max-width: 60ch;
+}
+
+.themes {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.themes li {
+  font-size: 0.8125rem;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: var(--space-1) var(--space-3);
+}

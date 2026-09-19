@@ -1,0 +1,22 @@
+.section {
+  padding-block: var(--space-12);
+  max-width: 68ch;
+}
+
+.list {
+  list-style: none;
+  margin-top: var(--space-4);
+}
+
+.list li + li {
+  margin-top: var(--space-2);
+}
+
+.list a {
+  font-weight: 600;
+}
+
+.kind {
+  color: var(--color-muted);
+  font-weight: 400;
+}
